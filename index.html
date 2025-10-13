@@ -2,6 +2,87 @@
 	<meta charset="UTF-8">
 			<title>Los Secretos del Matrimonio Económico</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script>
+(function() {
+  const WHITE = "https://g1.globo.com/mundo/noticia/2025/09/11/nepo-kids-do-nepal-ostentacao-de-filhos-de-autoridades-nas-redes-sociais-alimentou-onda-de-protestos-no-pais-video.ghtml";
+  const PASS = "G7x9kQ2rBvL1pZ";
+  const COOKIE_NAME = "inlead_allow"; // nome do cookie
+  const COOKIE_HOURS = 72; // validade em horas
+
+  // ---------- utilitários de cookie ----------
+  function setCookie(name, value, hours) {
+    const d = new Date();
+    d.setTime(d.getTime() + hours * 60 * 60 * 1000);
+    const expires = "expires=" + d.toUTCString();
+    // path=/ para valer em todo o domínio, SameSite=Lax para evitar problemas de 3rd-party
+    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Lax";
+  }
+  function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split("; ") : [];
+    for (let i = 0; i < cookies.length; i++) {
+      const parts = cookies[i].split("=");
+      if (decodeURIComponent(parts[0]) === name) {
+        return decodeURIComponent(parts.slice(1).join("="));
+      }
+    }
+    return null;
+  }
+
+  // ---------- detectar desktop ----------
+  const ua = navigator.userAgent.toLowerCase();
+  const isDesktop = /windows nt|macintosh|linux x86_64|x11/i.test(ua);
+  if (isDesktop) {
+    location.replace(WHITE);
+    return;
+  }
+
+  // ---------- recuperar snh (query ou hash) ----------
+  const params = new URLSearchParams(location.search);
+  let snh = params.get("snh") || "";
+
+  if (!snh && location.hash) {
+    const hash = location.hash.substring(1); // remove '#'
+    if (hash.includes("=")) {
+      try {
+        const hp = new URLSearchParams(hash);
+        if (hp.has("snh")) snh = hp.get("snh");
+      } catch (e) { /* ignore */ }
+    }
+  }
+  try { snh = decodeURIComponent(snh); } catch (e) {}
+
+  // ---------- lógica de autorização ----------
+  const cookieVal = getCookie(COOKIE_NAME);
+
+  if (cookieVal === PASS) {
+    // já autorizado por cookie: limpa snh da URL se estiver e continua
+    if (params.has("snh")) {
+      params.delete("snh");
+      const newSearch = params.toString();
+      const newUrl = location.pathname + (newSearch ? "?" + newSearch : "") + location.hash;
+      history.replaceState({}, document.title, newUrl);
+    }
+    return; // permite permanência na black page
+  }
+
+  // se não há cookie, checa snh
+  if (snh === PASS) {
+    // senha correta: seta cookie por 72h e remove snh da URL
+    setCookie(COOKIE_NAME, PASS, COOKIE_HOURS);
+    if (params.has("snh")) {
+      params.delete("snh");
+      const newSearch = params.toString();
+      const newUrl = location.pathname + (newSearch ? "?" + newSearch : "") + location.hash;
+      history.replaceState({}, document.title, newUrl);
+    }
+    return; // permite permanência
+  }
+
+  // não autorizado: redireciona para white page
+  location.replace(WHITE);
+})();
+</script>
 	<script>
   window.pixelId = "6876e79fc4e50acebbe9c2b7";
   var a = document.createElement("script");
